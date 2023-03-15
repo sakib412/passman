@@ -7,7 +7,7 @@ import ItemCreateForm from './AddModal';
 
 const { Sider } = Layout;
 
-interface Folder {
+export interface Folder {
     id: number;
     name: string;
 }
@@ -49,11 +49,10 @@ const itemMenu: MenuProps['items'] = [
 
 interface ItemType {
     id: string;
-    key: string;
     name: string;
     username: string;
     password: string;
-    url?: string;
+    url?: string[];
     notes?: string;
     owner: number;
 }
@@ -61,35 +60,22 @@ interface ItemType {
 const data: ItemType[] = [
     {
         id: '1',
-        key: '1',
         name: 'John Brown',
         username: 'masd@sdgsd.sdfsf',
         password: '12312321',
-        owner: 2,
+        owner: 1,
         notes: 'New York No. 1 Lake Park',
-        url: 'https://www.google.com',
+        url: ['https://www.google.com'],
     },
     {
         id: '2',
-        key: '2',
         name: 'Jim Green',
         username: 'new',
         password: '12312321',
         owner: 1,
         notes: 'London No. 1 Lake Park',
-        url: 'https://www.google.com',
-    },
-    {
-        id: '3',
-        key: '3',
-        name: 'Joe Black',
-        username: 'nameW@amsdi.cas',
-        password: '12312321',
-        owner: 1,
-        notes: 'Sidney No. 1 Lake Park',
-        url: 'https://www.google.com',
+        url: ['https://www.google.com'],
     }
-
 ];
 
 const Home = () => {
@@ -243,10 +229,15 @@ const Home = () => {
                     </div>
                 </div>
 
-                <Table size='large' rowSelection={rowSelection} columns={columns} dataSource={data} />
+                <Table
+                    size='large'
+                    rowSelection={rowSelection}
+                    columns={columns}
+                    dataSource={data.map(item => ({ ...item, key: item.id }))} />
             </div>
 
             <ItemCreateForm
+                folders={folders}
                 open={isModalVisible}
                 onCancel={() => setIsModalVisible(false)}
                 onCreate={addItem} />

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button, Form, Input, Modal, Select } from 'antd';
 import { CopyOutlined, MinusCircleOutlined, PlusOutlined, RetweetOutlined } from '@ant-design/icons';
+import { Folder } from './Home';
 
 interface Values {
     name: string;
@@ -16,12 +17,14 @@ interface ItemCreateFormProps {
     open: boolean;
     onCreate: (values: Values) => void;
     onCancel: () => void;
+    folders: Folder[]
 }
 
 const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
     open,
     onCreate,
     onCancel,
+    folders
 }) => {
     const [form] = Form.useForm();
     return (
@@ -67,8 +70,12 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                         <Form.Item name="folder" label="Folder">
                             <Select>
                                 <Select.Option value="0">No folder</Select.Option>
-                                <Select.Option value={"1"}>Folder 1</Select.Option>
-                                <Select.Option value={"2"}>folder 2</Select.Option>
+                                {folders.map(folder =>
+                                    <Select.Option key={folder.id} value={String(folder.id)}>
+                                        {folder.name}
+                                    </Select.Option>
+                                )
+                                }
                             </Select>
                         </Form.Item>
                     </div>
