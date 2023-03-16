@@ -4,7 +4,7 @@ import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Fo
 import type { ColumnsType } from 'antd/es/table';
 import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
-import axios from 'axios';
+import axiosInstance from '@/utils/axios';
 
 const { Sider } = Layout;
 
@@ -115,7 +115,7 @@ const Home = ({ folders: foldersData }: HomeProps) => {
             content: (
                 <Form
                     onFinish={(values) => {
-                        axios.post('http://localhost:5000/api/folder/', { name: values.name }).then(res => {
+                        axiosInstance.post('/folder/', { name: values.name }).then(res => {
                             setFolders(f => [...f, res.data.data])
                         })
                         Modal.destroyAll()
@@ -127,7 +127,7 @@ const Home = ({ folders: foldersData }: HomeProps) => {
                         name="name"
                         rules={[{ required: true, message: 'Please input folder name!' }]}
                     >
-                        <Input />
+                        <Input autoFocus />
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">Add</Button>
@@ -180,7 +180,7 @@ const Home = ({ folders: foldersData }: HomeProps) => {
                                     content: (
                                         <Form
                                             onFinish={(values) => {
-                                                axios.put(`http://localhost:5000/api/folder/${_id}`, { name: values.name }).then(res => {
+                                                axiosInstance.put(`/folder/${_id}`, { name: values.name }).then(res => {
                                                     setFolders(f => f.map(folder => folder._id == _id ? res.data.data : folder))
                                                 })
                                                 Modal.destroyAll()
@@ -198,7 +198,7 @@ const Home = ({ folders: foldersData }: HomeProps) => {
                                             </Form.Item>
                                             <div className='d-flex'>
                                                 <Button className='me-2' danger onClick={() => {
-                                                    axios.delete(`http://localhost:5000/api/folder/${_id}`).then(_res => {
+                                                    axiosInstance.delete(`/folder/${_id}`).then(_res => {
                                                         setFolders(f => f.filter(folder => folder._id != _id))
                                                         Modal.destroyAll()
                                                     })

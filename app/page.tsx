@@ -1,8 +1,9 @@
 import Home, { type Folder } from "@/components/Home/Home";
+import axiosInstance from "@/utils/axios";
 import axios from "axios";
 
 const getAllFolders = async () => {
-  const response = await axios.get("http://localhost:5000/api/folder/");
+  const response = await axiosInstance.get("/folder/");
   return response.data;
 }
 
