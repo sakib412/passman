@@ -17,27 +17,27 @@ export interface Folder {
 
 const itemMenu: MenuProps['items'] = [
     {
+        key: 'copy_username',
         label: "Copy username",
-        key: '0',
         icon: <CopyOutlined />
 
     },
     {
+        key: 'copy_password',
         label: "Copy password",
-        key: '1',
         icon: <CopyOutlined />
     },
     {
+        key: "move",
         label: "Move to another folder",
-        key: '2',
         icon: <RightCircleOutlined />
 
     },
     {
+        key: 'delete',
         label: "Delete",
-        key: '3',
         icon: <DeleteOutlined />,
-        danger: true
+        danger: true,
     },
 ];
 
@@ -52,27 +52,7 @@ export interface ItemType {
     owner: number;
 }
 
-const data: ItemType[] = [
-    {
-        _id: '1',
-        name: 'John Brown',
-        username: 'masd@sdgsd.sdfsf',
-        password: '12312321',
-        owner: 1,
-        notes: 'New York No. 1 Lake Park',
-        url: ['https://www.google.com'],
-    },
-    {
-        _id: '2',
-        name: 'Jim Green',
-        username: 'new',
-        password: '12312321',
-        owner: 1,
-        notes: 'London No. 1 Lake Park',
-        url: ['https://www.google.com'],
-    }
-];
-
+type ItemActionType = 'copy_username' | 'copy_password' | 'move' | 'delete';
 
 type HomeProps = {
     folders: {
@@ -117,6 +97,39 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             disabled: !hasSelected
         },
     ];
+
+    const onItemAction = (key: ItemActionType, id: ItemType['_id']) => {
+        switch (key) {
+            case 'copy_username':
+                console.log('copy username')
+                break;
+            case 'copy_password':
+                console.log('copy password')
+                break;
+            case 'move':
+                console.log('move to another folder')
+                break;
+            case 'delete':
+                Modal.confirm({
+                    title: 'Are you sure to delete this item?',
+                    icon: <DeleteOutlined />,
+                    content: 'This action cannot be undone',
+                    okText: 'Yes',
+                    okType: 'danger',
+                    cancelText: 'No',
+                    onOk() {
+                        axiosInstance.delete(`/item/${id}`).then(res => {
+                            setItems(i => i.filter(item => item._id !== id))
+                        })
+                    }
+                });
+
+                break;
+            default:
+                break;
+        }
+
+    }
 
     const addFolder = () => {
         Modal.info({
@@ -256,7 +269,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         },
         {
             title: <Dropdown
-                menu={{ items: selectedItemMenu, onClick: (item) => { console.log(item) } }} trigger={['click']}>
+                menu={{ items: selectedItemMenu, onClick: (item) => { console.log(item, "hjsd") } }} trigger={['click']}>
                 <Space style={{ cursor: 'pointer' }}>
                     <MoreOutlined style={{ fontSize: '23px' }} />
                 </Space>
@@ -264,7 +277,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             key: 'action',
             align: 'right',
             render: (_, record) => (
-                <Dropdown menu={{ items: itemMenu, onClick: (item) => { console.log(item, record) } }} trigger={['click']}>
+                <Dropdown menu={{ items: itemMenu, onClick: (item) => { onItemAction(item.key as ItemActionType, record._id) } }} trigger={['click']}>
                     <Space style={{ cursor: 'pointer' }}>
                         <MoreOutlined style={{ fontSize: '23px' }} />
                     </Space>
@@ -288,7 +301,8 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
 
     const addItem = async (values: any) => {
         const { data } = await axiosInstance.post('/item/', values);
-        setItems(i => [...i, data.data])
+        // add item in front
+        setItems(i => [data.data, ...i])
     }
 
     return (
