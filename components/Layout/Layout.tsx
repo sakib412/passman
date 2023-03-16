@@ -9,8 +9,8 @@ const { Header, Content } = Layout;
 
 const mainMenu: MenuProps['items'] = [
     { key: '/', label: "Home" },
-    { key: '/login', label: 'Login' },
-    { key: '/signup', label: 'Signup' }
+    // { key: '/login', label: 'Login' },
+    // { key: '/signup', label: 'Signup' }
 ].map(({ key, label }) => ({
     key,
     label: <Link href={key}>{label}</Link>
