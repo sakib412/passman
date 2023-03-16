@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, } from 'antd';
+import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, Select, } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
@@ -108,7 +108,51 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                 copyToClipboard(item.password)
                 break;
             case 'move':
-                console.log('move to another folder')
+                Modal.info({
+                    icon: null,
+                    title: 'Move to another folder',
+                    content: (
+                        <Form
+
+                            onFinish={(values) => {
+                                axiosInstance.put(`/item/${item._id}/`, { folder: values.folder }).then(({ data }) => {
+                                    const { is_success, data: item } = data
+                                    if (is_success) {
+                                        const updateItemIndex = items.findIndex(i => i._id === item._id)
+                                        const newItems = [...items]
+                                        newItems[updateItemIndex] = item
+                                        setItems(newItems)
+                                    }
+                                })
+                                Modal.destroyAll()
+                            }}
+                            name="move_item"
+                        >
+                            <Form.Item
+
+                                label="Folder"
+                                name="folder"
+                                rules={[{ required: true, message: 'Please select a folder' }]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="Select a folder"
+                                    optionFilterProp="children"
+
+                                >
+                                    {folders.map(folder => (
+                                        <Select.Option key={folder._id} value={folder._id}>{folder.name}</Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">Move</Button>
+                            </Form.Item>
+                        </Form>
+                    ),
+                    okButtonProps: { style: { display: 'none' } },
+
+                });
                 break;
             case 'delete':
                 Modal.confirm({
