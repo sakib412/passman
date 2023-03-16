@@ -3,11 +3,8 @@ import axios from "axios";
 
 const getAllFolders = async () => {
   const response = await axios.get("http://localhost:5000/api/folder/");
-  console.log(response)
   return response.data;
-
 }
-
 
 export default async function HomePage() {
   const folders: {

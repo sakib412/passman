@@ -71,7 +71,7 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                             <Select>
                                 <Select.Option value="0">No folder</Select.Option>
                                 {folders.map(folder =>
-                                    <Select.Option key={folder.id} value={String(folder.id)}>
+                                    <Select.Option key={folder._id} value={String(folder._id)}>
                                         {folder.name}
                                     </Select.Option>
                                 )

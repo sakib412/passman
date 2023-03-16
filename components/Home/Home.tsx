@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { CopyOutlined, DeleteOutlined, FolderFilled, FolderOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
 import axios from 'axios';
 
@@ -166,10 +166,57 @@ const Home = ({ folders: foldersData }: HomeProps) => {
                         onClick={addFolder}>+</span>
                 </div>),
 
-                children: folders.map(({ _id, name }, j) => {
+                children: folders.map(({ _id, name }) => {
                     return {
                         key: _id,
-                        label: name,
+                        label: <div className='d-flex'>
+                            <span>{name}</span>
+                            <span className='text-secondary ms-auto text-white' onClick={(e) => {
+                                e.stopPropagation();
+
+                                Modal.info({
+                                    icon: null,
+                                    title: 'Edit folder',
+                                    content: (
+                                        <Form
+                                            onFinish={(values) => {
+                                                axios.put(`http://localhost:5000/api/folder/${_id}`, { name: values.name }).then(res => {
+                                                    setFolders(f => f.map(folder => folder._id == _id ? res.data.data : folder))
+                                                })
+                                                Modal.destroyAll()
+                                            }}
+                                            name="edit_folder"
+                                            initialValues={{ name }}
+                                        >
+                                            <Form.Item
+
+                                                label="Folder name"
+                                                name="name"
+                                                rules={[{ required: true, message: 'Please input folder name!' }]}
+                                            >
+                                                <Input />
+                                            </Form.Item>
+                                            <div className='d-flex'>
+                                                <Button className='me-2' danger onClick={() => {
+                                                    axios.delete(`http://localhost:5000/api/folder/${_id}`).then(_res => {
+                                                        setFolders(f => f.filter(folder => folder._id != _id))
+                                                        Modal.destroyAll()
+                                                    })
+                                                }}>Delete</Button>
+                                                <Form.Item>
+                                                    <Button type="primary" htmlType="submit">Edit</Button>
+                                                </Form.Item>
+                                            </div>
+
+                                        </Form>
+                                    ),
+                                    okButtonProps: { style: { display: 'none' } },
+
+
+
+                                })
+                            }}><EditOutlined /></span>
+                        </div>,
                     };
                 }),
             };
