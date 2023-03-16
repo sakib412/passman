@@ -6,7 +6,6 @@ import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutline
 import ItemCreateForm from './AddModal';
 import axiosInstance from '@/utils/axios';
 import { copyToClipboard } from '@/utils';
-import ItemEditForm from './EditItemModal';
 
 const { Sider } = Layout;
 
@@ -219,7 +218,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                         style={{ width: '100%' }}
                         size='large'
                         onFinish={(values) => {
-                            axiosInstance.put(`/item/${item._id}/`, values).then(({ data }) => {
+                            axiosInstance.put(`/item/${item._id}/`, { ...values, folder: values.folder || null }).then(({ data }) => {
                                 const { is_success, data: item } = data
                                 if (is_success) {
                                     const updateItemIndex = items.findIndex(i => i._id === item._id)
