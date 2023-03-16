@@ -42,6 +42,7 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                     .then((values) => {
                         form.resetFields();
                         onCreate(values);
+                        onCancel()
                     })
                     .catch((info) => {
                         console.log('Validate Failed:', info);
@@ -53,7 +54,7 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                 form={form}
                 layout="vertical"
                 name="new_item"
-                initialValues={{ folder: "0", url: [''] }}
+                initialValues={{ folder: null, url: [''] }}
                 autoComplete="off"
             >
                 <div className="row">
@@ -69,7 +70,7 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                     <div className="col-md-6">
                         <Form.Item name="folder" label="Folder">
                             <Select>
-                                <Select.Option value="0">No folder</Select.Option>
+                                <Select.Option value={null}>No folder</Select.Option>
                                 {folders.map(folder =>
                                     <Select.Option key={folder._id} value={String(folder._id)}>
                                         {folder.name}

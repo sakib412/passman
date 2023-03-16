@@ -42,8 +42,8 @@ const itemMenu: MenuProps['items'] = [
 ];
 
 
-interface ItemType {
-    id: string;
+export interface ItemType {
+    _id: string;
     name: string;
     username: string;
     password: string;
@@ -54,7 +54,7 @@ interface ItemType {
 
 const data: ItemType[] = [
     {
-        id: '1',
+        _id: '1',
         name: 'John Brown',
         username: 'masd@sdgsd.sdfsf',
         password: '12312321',
@@ -63,7 +63,7 @@ const data: ItemType[] = [
         url: ['https://www.google.com'],
     },
     {
-        id: '2',
+        _id: '2',
         name: 'Jim Green',
         username: 'new',
         password: '12312321',
@@ -83,10 +83,20 @@ type HomeProps = {
         nextPage: number | null,
         data: Folder[]
     }
+
+    items: {
+        currentPage: number,
+        totalData: number,
+        totalPage: number,
+        prevPage: number | null,
+        nextPage: number | null,
+        data: ItemType[]
+    }
 }
-const Home = ({ folders: foldersData }: HomeProps) => {
+const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-    const [folders, setFolders] = useState<Folder[]>(() => foldersData.data)
+    const [folders, setFolders] = useState<Folder[]>(() => foldersData.data);
+    const [items, setItems] = useState<ItemType[]>(itemsData.data);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const [loading, setLoading] = useState(false);
@@ -139,7 +149,7 @@ const Home = ({ folders: foldersData }: HomeProps) => {
         });
     }
 
-    const editItem = (id: ItemType['id']) => {
+    const editItem = (id: ItemType['_id']) => {
         console.log(id)
     }
 
@@ -229,9 +239,9 @@ const Home = ({ folders: foldersData }: HomeProps) => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            render: (_, { username, name, id }) =>
+            render: (_, { username, name, _id }) =>
                 <div
-                    onClick={() => editItem(id)}
+                    onClick={() => editItem(_id)}
                     style={{ cursor: 'pointer' }}
                 ><span
                     title='Edit item'
@@ -276,9 +286,9 @@ const Home = ({ folders: foldersData }: HomeProps) => {
         onChange: onSelectChange,
     };
 
-    const addItem = (values: any) => {
-        console.log(values)
-
+    const addItem = async (values: any) => {
+        const { data } = await axiosInstance.post('/item/', values);
+        setItems(i => [...i, data.data])
     }
 
     return (
@@ -313,7 +323,7 @@ const Home = ({ folders: foldersData }: HomeProps) => {
                     size='large'
                     rowSelection={rowSelection}
                     columns={columns}
-                    dataSource={data.map(item => ({ ...item, key: item.id }))} />
+                    dataSource={items.map(item => ({ ...item, key: item._id }))} />
             </div>
 
             <ItemCreateForm
