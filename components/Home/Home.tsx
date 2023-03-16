@@ -2,10 +2,11 @@
 import React, { useState } from 'react'
 import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, Select, } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MinusCircleOutlined, MoreOutlined, PlusOutlined, RetweetOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
 import axiosInstance from '@/utils/axios';
 import { copyToClipboard } from '@/utils';
+import ItemEditForm from './EditItemModal';
 
 const { Sider } = Layout;
 
@@ -51,6 +52,7 @@ export interface ItemType {
     url?: string[];
     notes?: string;
     owner: number;
+    folder?: string;
 }
 
 type ItemActionType = 'copy_username' | 'copy_password' | 'move' | 'delete';
@@ -113,7 +115,6 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     title: 'Move to another folder',
                     content: (
                         <Form
-
                             onFinish={(values) => {
                                 axiosInstance.put(`/item/${item._id}/`, { folder: values.folder }).then(({ data }) => {
                                     const { is_success, data: item } = data
@@ -207,8 +208,120 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         });
     }
 
-    const editItem = (id: ItemType['_id']) => {
-        console.log(id)
+    const editItem = (item: ItemType) => {
+        Modal.info(
+            {
+                width: 800,
+                icon: null,
+                title: 'Edit item',
+                content: (
+                    <Form
+                        style={{ width: '100%' }}
+                        size='large'
+                        onFinish={(values) => {
+                            axiosInstance.put(`/item/${item._id}/`, values).then(({ data }) => {
+                                const { is_success, data: item } = data
+                                if (is_success) {
+                                    const updateItemIndex = items.findIndex(i => i._id === item._id)
+                                    const newItems = [...items]
+                                    newItems[updateItemIndex] = item
+                                    setItems(newItems)
+                                    Modal.destroyAll()
+
+                                }
+                            })
+                        }}
+
+
+                        layout="vertical"
+                        name="edit_item"
+                        initialValues={{ ...item, folder: item.folder || "" }}
+                    >
+                        <div className="row">
+                            <div className="col-md-6">
+                                <Form.Item
+                                    name="name"
+                                    label="Name"
+                                    rules={[{ required: true, message: 'Please input the name' }]}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            </div>
+                            <div className="col-md-6">
+                                <Form.Item name="folder" label="Folder">
+                                    <Select>
+                                        <Select.Option value={""}>No folder</Select.Option>
+                                        {folders.map(folder =>
+                                            <Select.Option key={folder._id} value={folder._id}>
+                                                {folder.name}
+                                            </Select.Option>
+                                        )
+                                        }
+                                    </Select>
+                                </Form.Item>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-6">
+                                <Form.Item name="username"
+                                    label="Username">
+                                    <Input />
+                                </Form.Item>
+                            </div>
+                            <div className="col-md-6">
+                                <Form.Item name="password" label={<div className='d-flex justify-content-between w-100'>
+                                    <div>Password</div>
+                                    <div className='ms-3'><CopyOutlined /> <RetweetOutlined /></div>
+                                </div>}>
+                                    <Input.Password />
+                                </Form.Item>
+                            </div>
+                        </div>
+
+                        <Form.List name="url">
+                            {(fields, { add, remove }) => (
+                                <div className='row'>
+                                    {fields.map(({ key, name, ...restField }) => (
+                                        <div key={key} className="col-md-6 mb-3 d-flex align-items-center">
+                                            <Form.Item
+                                                className='mb-0 w-75'
+                                                {...restField}
+                                                name={[name]}
+                                                rules={[{ required: true, message: 'Please input URL' }]}
+                                            >
+                                                <Input placeholder="Example: https://google.com" />
+                                            </Form.Item>
+
+                                            <MinusCircleOutlined style={{ fontSize: "22px", marginLeft: '0.5rem' }} onClick={() => remove(name)} />
+                                        </div>
+                                    ))}
+                                    <Form.Item>
+                                        <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                            Add field
+                                        </Button>
+                                    </Form.Item>
+                                </div>
+                            )}
+                        </Form.List>
+
+                        <Form.Item name="note" label="Note">
+                            <Input.TextArea />
+                        </Form.Item>
+                        <div className='d-flex'>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">Save</Button>
+                            </Form.Item>
+                            <Button className='ms-3' onClick={() => Modal.destroyAll()}>Cancel</Button>
+                        </div>
+
+                    </Form>
+                ),
+                okButtonProps: {
+                    style: { display: 'none' }
+                }
+            }
+        )
+
     }
 
     const start = () => {
@@ -297,13 +410,14 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            render: (_, { username, name, _id }) =>
+            render: (_, item) =>
                 <div
-                    onClick={() => editItem(_id)}
-                    style={{ cursor: 'pointer' }}
-                ><span
-                    title='Edit item'
-                    className='text-primary'>{name}</span><br /><span className='text-secondary'>{username}</span>
+                    onClick={() => editItem(item)}
+                    style={{ cursor: 'pointer' }}>
+                    <span
+                        title='Click to edit item'
+                        className='text-primary'>{item.name}</span><br />
+                    <span className='text-secondary'>{item.username}</span>
                 </div>,
         },
         {
@@ -314,7 +428,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         },
         {
             title: <Dropdown
-                menu={{ items: selectedItemMenu, onClick: (item) => { console.log(item, "hjsd") } }} trigger={['click']}>
+                menu={{ items: selectedItemMenu, onClick: (item) => { console.log(item, "sdfgs") } }} trigger={['click']}>
                 <Space style={{ cursor: 'pointer' }}>
                     <MoreOutlined style={{ fontSize: '23px' }} />
                 </Space>
@@ -322,7 +436,9 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             key: 'action',
             align: 'right',
             render: (_, record) => (
-                <Dropdown menu={{ items: itemMenu, onClick: (item) => { onItemAction(item.key as ItemActionType, record) } }} trigger={['click']}>
+                <Dropdown
+                    menu={{ items: itemMenu, onClick: (item) => { onItemAction(item.key as ItemActionType, record) } }}
+                    trigger={['click']}>
                     <Space style={{ cursor: 'pointer' }}>
                         <MoreOutlined style={{ fontSize: '23px' }} />
                     </Space>
@@ -352,7 +468,6 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
 
     return (
         <div className='d-flex'>
-
             <Sider width={200} style={{ background: colorBgContainer }} breakpoint="lg" collapsedWidth="0">
                 <Menu
                     mode="inline"
@@ -384,6 +499,8 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     columns={columns}
                     dataSource={items.map(item => ({ ...item, key: item._id }))} />
             </div>
+
+
 
             <ItemCreateForm
                 folders={folders}

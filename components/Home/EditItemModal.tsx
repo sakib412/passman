@@ -4,7 +4,7 @@ import { Button, Form, Input, Modal, Select } from 'antd';
 import { CopyOutlined, MinusCircleOutlined, PlusOutlined, RetweetOutlined } from '@ant-design/icons';
 import { Folder } from './Home';
 
-interface Values {
+export interface InitialItemType {
     name: string;
     username: string;
     password: string;
@@ -13,16 +13,17 @@ interface Values {
     url: string[]
 }
 
-interface ItemCreateFormProps {
+interface ItemEditFormProps {
     open: boolean;
-    onCreate: (values: Values) => void;
+    onUpdate: (values: InitialItemType) => void;
     onCancel: () => void;
-    folders: Folder[]
+    folders: Folder[];
+    initialValues: InitialItemType;
 }
 
-const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
+const ItemEditForm: React.FC<ItemEditFormProps> = ({
     open,
-    onCreate,
+    onUpdate,
     onCancel,
     folders
 }) => {
@@ -41,7 +42,7 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                     .validateFields()
                     .then((values) => {
                         form.resetFields();
-                        onCreate(values);
+                        onUpdate(values);
                         onCancel()
                     })
                     .catch((info) => {
@@ -53,7 +54,7 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                 size='large'
                 form={form}
                 layout="vertical"
-                name="new_item"
+                name="edit_item"
                 initialValues={{ folder: null, url: [''] }}
                 autoComplete="off"
             >
@@ -135,4 +136,4 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
     );
 };
 
-export default ItemCreateForm
+export default ItemEditForm
