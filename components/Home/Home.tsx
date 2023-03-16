@@ -4,20 +4,15 @@ import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Fo
 import type { ColumnsType } from 'antd/es/table';
 import { CopyOutlined, DeleteOutlined, FolderFilled, FolderOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
+import axios from 'axios';
 
 const { Sider } = Layout;
 
 export interface Folder {
-    id: number;
+    _id: number;
     name: string;
 }
 
-
-const foldersData: Folder[] = [
-    { id: 1, name: 'Folder 1' },
-    { id: 2, name: 'Folder 2' },
-    { id: 3, name: 'Folder 3' },
-]
 
 
 const itemMenu: MenuProps['items'] = [
@@ -78,9 +73,20 @@ const data: ItemType[] = [
     }
 ];
 
-const Home = () => {
+
+type HomeProps = {
+    folders: {
+        currentPage: number,
+        totalData: number,
+        totalPage: number,
+        prevPage: number | null,
+        nextPage: number | null,
+        data: Folder[]
+    }
+}
+const Home = ({ folders: foldersData }: HomeProps) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-    const [folders, setFolders] = useState<Folder[]>(() => foldersData)
+    const [folders, setFolders] = useState<Folder[]>(() => foldersData.data)
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const [loading, setLoading] = useState(false);
@@ -103,7 +109,34 @@ const Home = () => {
     ];
 
     const addFolder = () => {
-        setFolders(f => [...f, { id: f.length + 1, name: `Folder ${f.length + 1}` }])
+        Modal.info({
+            icon: null,
+            title: 'Add new folder',
+            content: (
+                <Form
+                    onFinish={(values) => {
+                        axios.post('http://localhost:5000/api/folder/', { name: values.name }).then(res => {
+                            setFolders(f => [...f, res.data.data])
+                        })
+                        Modal.destroyAll()
+                    }}
+                    name="add_folder"
+                >
+                    <Form.Item
+                        label="Folder name"
+                        name="name"
+                        rules={[{ required: true, message: 'Please input folder name!' }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit">Add</Button>
+                    </Form.Item>
+                </Form>
+            ),
+            okButtonProps: { style: { display: 'none' } },
+
+        });
     }
 
     const editItem = (id: ItemType['id']) => {
@@ -133,9 +166,9 @@ const Home = () => {
                         onClick={addFolder}>+</span>
                 </div>),
 
-                children: folders.map(({ id, name }, j) => {
+                children: folders.map(({ _id, name }, j) => {
                     return {
-                        key: id,
+                        key: _id,
                         label: name,
                     };
                 }),

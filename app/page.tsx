@@ -1,10 +1,27 @@
-import Home from "@/components/Home/Home";
+import Home, { type Folder } from "@/components/Home/Home";
+import axios from "axios";
+
+const getAllFolders = async () => {
+  const response = await axios.get("http://localhost:5000/api/folder/");
+  console.log(response)
+  return response.data;
+
+}
 
 
+export default async function HomePage() {
+  const folders: {
+    is_success: boolean; data: {
+      currentPage: number,
+      totalData: number,
+      totalPage: number,
+      prevPage: number | null,
+      nextPage: number | null,
+      data: Folder[]
+    }
+  } = await getAllFolders();
 
-
-export default function HomePage() {
   return (
-    <Home />
+    <Home folders={folders.data} />
   )
 }
