@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, Select, } from 'antd';
+import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, Select, message, } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MinusCircleOutlined, MoreOutlined, PlusOutlined, RetweetOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
@@ -55,6 +55,7 @@ export interface ItemType {
 }
 
 type ItemActionType = 'copy_username' | 'copy_password' | 'move' | 'delete';
+type BulkActionType = 'bulkMove' | 'bulkDelete';
 
 type HomeProps = {
     folders: {
@@ -85,20 +86,82 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const hasSelected = selectedRowKeys.length > 0;
     const selectedItemMenu: MenuProps['items'] = [
         {
+            key: 'bulkMove',
             label: "Move selected items to another folder",
-            key: '0',
             icon: <FolderOutlined />,
             disabled: !hasSelected
 
         },
         {
+            key: 'bulkDelete',
             label: "Delete selected items",
-            key: '1',
             icon: <DeleteOutlined />,
             danger: true,
             disabled: !hasSelected
         },
     ];
+
+    const onBulkAction = (key: BulkActionType) => {
+        switch (key) {
+            case 'bulkMove':
+                Modal.info({
+                    icon: null,
+                    title: 'Move selected items to another folder',
+                    content: (
+                        <Form
+                            onFinish={(values) => {
+                                axiosInstance.put('/item/update-many/', { ids: selectedRowKeys, folder: values.folder || null }).then(({ data }) => {
+                                    const { is_success } = data
+                                    if (is_success) {
+                                        message.success('Items moved successfully')
+                                    }
+                                })
+                                Modal.destroyAll()
+                            }}
+                            name="bulk_move_item"
+                        >
+                            <Form.Item
+                                name="folder"
+                                label="Folder"
+                                rules={[{ required: true, message: 'Please select a folder' }]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="Select a folder"
+                                >
+                                    {folders.map(folder => (
+                                        <Select.Option key={folder._id} value={folder._id}>{folder.name}</Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">Move</Button>
+                            </Form.Item>
+                        </Form>
+                    ),
+                    okButtonProps: { style: { display: 'none' } },
+
+                }
+                );
+                break;
+            case 'bulkDelete':
+                Modal.confirm({
+                    title: 'Are you sure you want to delete selected items?',
+                    icon: <DeleteOutlined />,
+                    onOk: () => {
+                        axiosInstance.post('/item/delete-many/', { ids: selectedRowKeys }).then(({ data }) => {
+                            const { is_success, } = data
+                            if (is_success) {
+                                setItems(items => items.filter((item: ItemType) => !selectedRowKeys.includes(item._id)))
+                                message.success('Items deleted successfully')
+                            }
+
+                        })
+                    }
+                })
+                break;
+        }
+    }
 
     const onItemAction = (key: ItemActionType, item: ItemType) => {
         switch (key) {
@@ -115,7 +178,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     content: (
                         <Form
                             onFinish={(values) => {
-                                axiosInstance.put(`/item/${item._id}/`, { folder: values.folder }).then(({ data }) => {
+                                axiosInstance.put(`/item/${item._id}/`, { folder: values.folder || null }).then(({ data }) => {
                                     const { is_success, data: item } = data
                                     if (is_success) {
                                         const updateItemIndex = items.findIndex(i => i._id === item._id)
@@ -427,7 +490,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         },
         {
             title: <Dropdown
-                menu={{ items: selectedItemMenu, onClick: (item) => { console.log(item, "sdfgs") } }} trigger={['click']}>
+                menu={{ items: selectedItemMenu, onClick: (item) => { onBulkAction(item.key as BulkActionType) } }} trigger={['click']}>
                 <Space style={{ cursor: 'pointer' }}>
                     <MoreOutlined style={{ fontSize: '23px' }} />
                 </Space>
