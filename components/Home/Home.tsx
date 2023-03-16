@@ -5,6 +5,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
 import axiosInstance from '@/utils/axios';
+import { copyToClipboard } from '@/utils';
 
 const { Sider } = Layout;
 
@@ -98,13 +99,13 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         },
     ];
 
-    const onItemAction = (key: ItemActionType, id: ItemType['_id']) => {
+    const onItemAction = (key: ItemActionType, item: ItemType) => {
         switch (key) {
             case 'copy_username':
-                console.log('copy username')
+                copyToClipboard(item.username)
                 break;
             case 'copy_password':
-                console.log('copy password')
+                copyToClipboard(item.password)
                 break;
             case 'move':
                 console.log('move to another folder')
@@ -118,8 +119,8 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     okType: 'danger',
                     cancelText: 'No',
                     onOk() {
-                        axiosInstance.delete(`/item/${id}`).then(res => {
-                            setItems(i => i.filter(item => item._id !== id))
+                        axiosInstance.delete(`/item/${item._id}`).then(res => {
+                            setItems(i => i.filter(item => item._id !== item._id))
                         })
                     }
                 });
@@ -277,7 +278,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             key: 'action',
             align: 'right',
             render: (_, record) => (
-                <Dropdown menu={{ items: itemMenu, onClick: (item) => { onItemAction(item.key as ItemActionType, record._id) } }} trigger={['click']}>
+                <Dropdown menu={{ items: itemMenu, onClick: (item) => { onItemAction(item.key as ItemActionType, record) } }} trigger={['click']}>
                     <Space style={{ cursor: 'pointer' }}>
                         <MoreOutlined style={{ fontSize: '23px' }} />
                     </Space>
