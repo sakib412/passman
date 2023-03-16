@@ -14,8 +14,6 @@ export interface Folder {
     name: string;
 }
 
-
-
 const itemMenu: MenuProps['items'] = [
     {
         key: 'copy_username',
