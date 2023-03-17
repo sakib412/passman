@@ -193,6 +193,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                                         const newItems = [...items]
                                         newItems[updateItemIndex] = item
                                         setItems(newItems)
+                                        message.success('Item moved successfully')
                                     }
                                 })
                                 Modal.destroyAll()
@@ -236,6 +237,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     onOk() {
                         axiosInstance.delete(`/item/${item._id}`).then(res => {
                             setItems(i => i.filter(item => item._id !== item._id))
+                            message.success('Item deleted successfully')
                         })
                     }
                 });
@@ -297,12 +299,10 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                                     newItems[updateItemIndex] = item
                                     setItems(newItems)
                                     Modal.destroyAll()
-
+                                    message.success('Item updated successfully')
                                 }
                             })
                         }}
-
-
                         layout="vertical"
                         name="edit_item"
                         initialValues={{ ...item, folder: item.folder || "" }}
@@ -531,6 +531,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         const { data } = await axiosInstance.post('/item/', values);
         // add item in front
         setItems(i => [data.data, ...i])
+        message.success('Item added successfully')
     }
 
     return (

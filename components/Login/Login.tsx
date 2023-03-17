@@ -2,11 +2,9 @@
 import { Button, Checkbox, Form, Input } from 'antd';
 
 const onFinish = (values: any) => {
-    console.log('Success:', values);
 };
 
 const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
 };
 
 import React from 'react'

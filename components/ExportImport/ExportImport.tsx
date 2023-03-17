@@ -10,6 +10,7 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import { UploadOutlined } from '@ant-design/icons';
 import { getExportFileName } from '@/utils';
 import axiosInstance from '@/utils/axios';
+import { useRouter } from 'next/router';
 
 
 type Props = {
@@ -28,7 +29,6 @@ const getBase64 = (file: RcFile): Promise<string> =>
 
 
 const ExportImport = ({ items }: Props) => {
-    console.log(items)
 
     const fields = ['name', 'username', 'password', 'url', 'note', 'owner', 'folder'];
     const json2csvParser = new Parser({ fields });
@@ -52,11 +52,12 @@ const ExportImport = ({ items }: Props) => {
 
     const [jsonData, setJsonData] = useState<any[]>([]);
 
+    const router = useRouter();
+
     const handleFileUpload = (file: File) => {
         parse(file, {
             header: true,
             complete: (result) => {
-                console.log(result.data.map((item: any) => ({ ...item, url: item.url.split(',') })))
                 setJsonData(result.data.map((item: any) => ({ ...item, url: item.url.split(',') })));
             },
             error: (err) => {
@@ -66,9 +67,14 @@ const ExportImport = ({ items }: Props) => {
     };
 
     const onFinish = async () => {
-        console.log('Received values:', jsonData);
-        const { data } = await axiosInstance.post('/item/insert-many/', { items: jsonData })
-        console.log(data)
+        await axiosInstance.post('/item/insert-many/', { items: jsonData })
+        message.success('Imported successfully')
+
+        setTimeout(() => {
+            router.push('/')
+        }, 3000)
+
+
 
         // You can now send jsonData to your server or save it to local storage
     };
