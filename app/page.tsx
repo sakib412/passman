@@ -1,13 +1,14 @@
 import Home, { ItemType, type Folder } from "@/components/Home/Home";
+import axiosInstance from "@/utils/axios";
 
 const getAllFolders = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/folder/`, { cache: 'no-store' });
-  return response.json();
+  const response = await axiosInstance.get("/folder/");
+  return response.data;
 }
 
 const getAllItems = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/item/`, { cache: 'no-store' });
-  return response.json();
+  const response = await axiosInstance.get("/item/");
+  return response.data;
 }
 
 export default async function HomePage() {

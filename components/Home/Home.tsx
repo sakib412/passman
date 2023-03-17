@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react'
 import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, Select, message, } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MinusCircleOutlined, MoreOutlined, PlusOutlined, RetweetOutlined, RightCircleOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MinusCircleOutlined, MoreOutlined, PlusOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
 import axiosInstance from '@/utils/axios';
-import { copyToClipboard, generatePassword } from '@/utils';
+import { copyToClipboard } from '@/utils';
 
 const { Sider } = Layout;
 
@@ -80,11 +80,14 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const [items, setItems] = useState<ItemType[]>(itemsData.data);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true)
+
         axiosInstance.get(`/item?folder=${selectedFolder}`).then(({ data }) => {
             setItems(data.data.data)
-        })
+        }).finally(() => setLoading(false))
 
     }, [selectedFolder])
 
@@ -561,6 +564,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                 </div>
 
                 <Table
+                    loading={loading}
                     size='large'
                     rowSelection={rowSelection}
                     columns={columns}
