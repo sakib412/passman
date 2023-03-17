@@ -233,8 +233,8 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     okType: 'danger',
                     cancelText: 'No',
                     onOk() {
-                        axiosInstance.delete(`/item/${item._id}`).then(res => {
-                            setItems(i => i.filter(item => item._id !== item._id))
+                        axiosInstance.delete(`/item/${item._id}`).then(({ data }) => {
+                            setItems(i => i.filter(item => item._id !== data.data._id))
                             message.success('Item deleted successfully')
                         })
                     }
