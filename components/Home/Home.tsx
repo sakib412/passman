@@ -82,11 +82,9 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 
     useEffect(() => {
-        if (selectedFolder) {
-            axiosInstance.get(`/item?folder=${selectedFolder === 'all' ? null : selectedFolder}`).then(({ data }) => {
-                setItems(data.data.data)
-            })
-        }
+        axiosInstance.get(`/item?folder=${selectedFolder}`).then(({ data }) => {
+            setItems(data.data.data)
+        })
 
     }, [selectedFolder])
 
@@ -405,7 +403,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                 icon: React.createElement(icon),
                 label: (<div className='d-flex justify-content-between text-white fs-5'>
                     <span style={{ cursor: 'pointer' }} onClick={() => {
-                        setSelectedFolder('all')
+                        setSelectedFolder(null)
                     }}>Folder</span>
                     <span style={{ cursor: 'pointer' }}
                         onClick={addFolder}>+</span>
