@@ -83,7 +83,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
 
     useEffect(() => {
         if (selectedFolder) {
-            axiosInstance.get(`/item?folder=${selectedFolder}`).then(({ data }) => {
+            axiosInstance.get(`/item?folder=${selectedFolder === 'all' ? null : selectedFolder}`).then(({ data }) => {
                 setItems(data.data.data)
             })
         }
@@ -404,7 +404,9 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                 type: 'group',
                 icon: React.createElement(icon),
                 label: (<div className='d-flex justify-content-between text-white fs-5'>
-                    <span>Folder</span>
+                    <span style={{ cursor: 'pointer' }} onClick={() => {
+                        setSelectedFolder('all')
+                    }}>Folder</span>
                     <span style={{ cursor: 'pointer' }}
                         onClick={addFolder}>+</span>
                 </div>),
@@ -535,6 +537,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         <div className='d-flex'>
             <Sider width={200} style={{ background: colorBgContainer }} breakpoint="lg" collapsedWidth="0">
                 <Menu
+                    selectedKeys={[selectedFolder as string]}
                     mode="inline"
                     defaultOpenKeys={['folder1']}
                     theme="dark"
@@ -545,7 +548,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             <div className='px-3 w-100'>
                 <div className="d-flex justify-content-between mb-3">
                     <h4>
-                        All vaults
+                        {folders.filter(f => f._id === selectedFolder)?.[0]?.name || "All items"}
                     </h4>
                     <div>
                         {/* <Button onClick={start} disabled={!hasSelected} loading={loading}>
