@@ -14,7 +14,7 @@ export async function copyToClipboard(text: string): Promise<void> {
 }
 
 export function generatePassword(
-    passwordLength = 8,
+    passwordLength = 16,
     minNums = 3,
     minSpecialChars = 2,
     allowCapital = true,

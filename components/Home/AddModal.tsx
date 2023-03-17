@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Form, Input, Modal, Select } from 'antd';
 import { CopyOutlined, MinusCircleOutlined, PlusOutlined, RetweetOutlined } from '@ant-design/icons';
 import { Folder } from './Home';
+import { copyToClipboard, generatePassword } from '@/utils';
 
 interface Values {
     name: string;
@@ -27,6 +28,8 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
     folders
 }) => {
     const [form] = Form.useForm();
+    const password = Form.useWatch('password', form)
+
     return (
         <Modal
             open={open}
@@ -91,7 +94,15 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                     <div className="col-md-6">
                         <Form.Item name="password" label={<div className='d-flex justify-content-between w-100'>
                             <div>Password</div>
-                            <div className='ms-3'><CopyOutlined /> <RetweetOutlined /></div>
+                            <div className='ms-3'>
+                                <CopyOutlined title='Copy' onClick={() => {
+                                    copyToClipboard(password)
+                                }} style={{ fontSize: '23px', marginRight: '0.3rem' }} />
+                                <RetweetOutlined
+                                    onClick={() => {
+                                        form.setFieldsValue({ password: generatePassword() })
+                                    }}
+                                    title='Generate password' style={{ fontSize: '23px' }} /></div>
                         </div>}>
                             <Input.Password />
                         </Form.Item>

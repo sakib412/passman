@@ -5,7 +5,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MinusCircleOutlined, MoreOutlined, PlusOutlined, RetweetOutlined, RightCircleOutlined } from '@ant-design/icons';
 import ItemCreateForm from './AddModal';
 import axiosInstance from '@/utils/axios';
-import { copyToClipboard } from '@/utils';
+import { copyToClipboard, generatePassword } from '@/utils';
 
 const { Sider } = Layout;
 
@@ -341,7 +341,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                             <div className="col-md-6">
                                 <Form.Item name="password" label={<div className='d-flex justify-content-between w-100'>
                                     <div>Password</div>
-                                    <div className='ms-3'><CopyOutlined /> <RetweetOutlined /></div>
+
                                 </div>}>
                                     <Input.Password />
                                 </Form.Item>
