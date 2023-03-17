@@ -147,3 +147,11 @@ export function generatePassword2(
     // Return the generated password
     return password;
 }
+
+
+export function getExportFileName(name: string = "export", ext: string = "csv"): string {
+    const date = new Date();
+    const timestamp = `${date.getFullYear()}-${date.getMonth() +
+        1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
+    return `${name}_${timestamp}.${ext}`;
+}

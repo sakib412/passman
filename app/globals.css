@@ -1,3 +1,7 @@
+a {
+  text-decoration: none;
+}
+
 .logo {
   float: left;
   width: 120px;
@@ -15,6 +19,6 @@
 
 }
 
-:where(.css-dev-only-do-not-override-i3gose).ant-checkbox-wrapper+:where(.css-dev-only-do-not-override-i3gose).ant-checkbox-wrapper {
+.ant-checkbox-wrapper {
   margin-inline-start: 0;
 }

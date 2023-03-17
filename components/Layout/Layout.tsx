@@ -10,6 +10,7 @@ const { Header, Content } = Layout;
 const mainMenu: MenuProps['items'] = [
     { key: '/', label: "Home" },
     { key: '/generate-password', label: 'Generate Password' },
+    { key: '/export-import', label: 'Export Import' },
     // { key: '/login', label: 'Login' },
     // { key: '/signup', label: 'Signup' }
 ].map(({ key, label }) => ({
