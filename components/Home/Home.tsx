@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MenuProps, Menu, Layout, theme, Space, Tag, Table, Dropdown, Button, Form, Input, Modal, Select, message, } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutlined, MinusCircleOutlined, MoreOutlined, PlusOutlined, RetweetOutlined, RightCircleOutlined } from '@ant-design/icons';
@@ -10,7 +10,7 @@ import { copyToClipboard } from '@/utils';
 const { Sider } = Layout;
 
 export interface Folder {
-    _id: number;
+    _id: string;
     name: string;
 }
 
@@ -79,9 +79,19 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const [folders, setFolders] = useState<Folder[]>(() => foldersData.data);
     const [items, setItems] = useState<ItemType[]>(itemsData.data);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 
-    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        if (selectedFolder) {
+            axiosInstance.get(`/item?folder=${selectedFolder}`).then(({ data }) => {
+                setItems(data.data.data)
+            })
+        }
+
+    }, [selectedFolder])
+
     const hasSelected = selectedRowKeys.length > 0;
+
     const selectedItemMenu: MenuProps['items'] = [
         {
             key: 'bulkMove',
@@ -384,14 +394,6 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
 
     }
 
-    const start = () => {
-        setLoading(true);
-        // ajax request after empty completing
-        setTimeout(() => {
-            setSelectedRowKeys([]);
-            setLoading(false);
-        }, 1000);
-    };
 
     const sideMenu: MenuProps['items'] = [FolderFilled].map(
         (icon, index) => {
@@ -410,53 +412,56 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                 children: folders.map(({ _id, name }) => {
                     return {
                         key: _id,
-                        label: <div className='d-flex'>
+                        label: <div className='d-flex'
+                            onClick={() => setSelectedFolder(_id)}
+                        >
                             <span>{name}</span>
-                            <span className='text-secondary ms-auto text-white' onClick={(e) => {
-                                e.stopPropagation();
+                            <span className='text-secondary ms-auto text-white'
+                                onClick={(e) => {
+                                    e.stopPropagation();
 
-                                Modal.info({
-                                    icon: null,
-                                    title: 'Edit folder',
-                                    content: (
-                                        <Form
-                                            onFinish={(values) => {
-                                                axiosInstance.put(`/folder/${_id}`, { name: values.name }).then(res => {
-                                                    setFolders(f => f.map(folder => folder._id == _id ? res.data.data : folder))
-                                                })
-                                                Modal.destroyAll()
-                                            }}
-                                            name="edit_folder"
-                                            initialValues={{ name }}
-                                        >
-                                            <Form.Item
-
-                                                label="Folder name"
-                                                name="name"
-                                                rules={[{ required: true, message: 'Please input folder name!' }]}
-                                            >
-                                                <Input />
-                                            </Form.Item>
-                                            <div className='d-flex'>
-                                                <Button className='me-2' danger onClick={() => {
-                                                    axiosInstance.delete(`/folder/${_id}`).then(_res => {
-                                                        setFolders(f => f.filter(folder => folder._id != _id))
-                                                        Modal.destroyAll()
+                                    Modal.info({
+                                        icon: null,
+                                        title: 'Edit folder',
+                                        content: (
+                                            <Form
+                                                onFinish={(values) => {
+                                                    axiosInstance.put(`/folder/${_id}`, { name: values.name }).then(res => {
+                                                        setFolders(f => f.map(folder => folder._id == _id ? res.data.data : folder))
                                                     })
-                                                }}>Delete</Button>
-                                                <Form.Item>
-                                                    <Button type="primary" htmlType="submit">Edit</Button>
+                                                    Modal.destroyAll()
+                                                }}
+                                                name="edit_folder"
+                                                initialValues={{ name }}
+                                            >
+                                                <Form.Item
+
+                                                    label="Folder name"
+                                                    name="name"
+                                                    rules={[{ required: true, message: 'Please input folder name!' }]}
+                                                >
+                                                    <Input />
                                                 </Form.Item>
-                                            </div>
+                                                <div className='d-flex'>
+                                                    <Button className='me-2' danger onClick={() => {
+                                                        axiosInstance.delete(`/folder/${_id}`).then(_res => {
+                                                            setFolders(f => f.filter(folder => folder._id != _id))
+                                                            Modal.destroyAll()
+                                                        })
+                                                    }}>Delete</Button>
+                                                    <Form.Item>
+                                                        <Button type="primary" htmlType="submit">Edit</Button>
+                                                    </Form.Item>
+                                                </div>
 
-                                        </Form>
-                                    ),
-                                    okButtonProps: { style: { display: 'none' } },
+                                            </Form>
+                                        ),
+                                        okButtonProps: { style: { display: 'none' } },
 
 
 
-                                })
-                            }}><EditOutlined /></span>
+                                    })
+                                }}><EditOutlined /></span>
                         </div>,
                     };
                 }),
