@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 import { Parser } from 'json2csv';
 import { Button, Form, message, Upload } from 'antd';
 import { parse } from 'papaparse';
-import type { RcFile } from 'antd/es/upload';
 import { UploadOutlined } from '@ant-design/icons';
 import { getExportFileName } from '@/utils';
 import axiosInstance from '@/utils/axios';
@@ -15,17 +14,6 @@ import { useRouter } from 'next/navigation';
 type Props = {
     items: any[]
 }
-
-
-const getBase64 = (file: RcFile): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-    });
-
-
 
 const ExportImport = ({ items }: Props) => {
 
@@ -66,7 +54,7 @@ const ExportImport = ({ items }: Props) => {
     };
 
     const onFinish = async () => {
-        await axiosInstance.post('/item/insert-many/', { items: jsonData })
+        await axiosInstance.post('/item/insert-many/', { items: jsonData.map(item => ({ ...item, folder: item.folder || null })) })
         message.success('Imported successfully')
 
         setTimeout(() => {

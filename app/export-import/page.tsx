@@ -6,8 +6,10 @@ export const metadata = {
     description: 'Export and import your passwords',
 }
 
+export const dynamic = "force-dynamic"
+
 const getAllItems = async () => {
-    const { data } = await axiosInstance.get('/item?size=1000')
+    const { data } = await axiosInstance.get("/item?size=1000")
     return data.data
 }
 
