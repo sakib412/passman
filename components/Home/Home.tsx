@@ -253,6 +253,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const addFolder = () => {
         Modal.info({
             icon: null,
+            closable: true,
             title: 'Add new folder',
             content: (
                 <Form

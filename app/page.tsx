@@ -1,6 +1,8 @@
 import Home, { ItemType, type Folder } from "@/components/Home/Home";
 import axiosInstance from "@/utils/axios";
 
+export const dynamic = "force-dynamic"
+
 const getAllFolders = async () => {
   const response = await axiosInstance.get("/folder/");
   return response.data;

@@ -1,7 +1,7 @@
 import { message } from "antd";
 
 export async function copyToClipboard(text: string): Promise<void> {
-    return navigator.clipboard.writeText(text)
+    return navigator.clipboard.writeText(text || '')
         .then(() => {
             // antd success notification
             message.success("Copied to clipboard", 1.5)
