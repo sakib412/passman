@@ -21,7 +21,6 @@ const Login = () => {
                 success('Login success')
             }
         } catch (e: any) {
-            console.log(e)
             error(e.response.data.data.message || 'Login failed')
         }
     };

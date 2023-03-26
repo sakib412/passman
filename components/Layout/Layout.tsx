@@ -34,7 +34,7 @@ export default function MainLayout({ children, user }: Props) {
         { key: '/', label: "Home" },
         { key: '/generate-password', label: 'Generate Password' },
         { key: '/export-import', label: 'Export Import' },
-        { key: '/logout', label: 'Logout', onClick: onLogout, }
+        { key: '/logout', label: `Logout (${user.username})`, onClick: onLogout, }
         ]
     } else {
         menuItems = [...menuItems,
@@ -44,7 +44,7 @@ export default function MainLayout({ children, user }: Props) {
     }
     const mainMenu: MenuProps['items'] = menuItems.map(({ key, label, onClick }) => ({
         key,
-        label: <Link href={key}>{label}</Link>,
+        label: !onClick ? <Link href={key}>{label}</Link> : label,
         onClick,
     }));
 

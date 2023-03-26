@@ -2,11 +2,28 @@
 
 import React from 'react'
 import { Button, Form, Input } from 'antd';
+import axiosInstance from '@/utils/axios';
+import { useRouter } from 'next/navigation';
+import { error, success } from '@/utils/notificaion';
 
-const onFinish = (values: any) => {
-}
+
 
 const Signup = () => {
+    const router = useRouter()
+    const onFinish = async (values: any) => {
+        try {
+
+            const res = await axiosInstance.post('/auth/signup', values)
+            if (res.data.is_success) {
+                router.refresh()
+                router.push('/')
+                success('Signup success')
+            }
+        } catch (e: any) {
+            error(e.response.data.data.message || 'Signup failed')
+        }
+
+    }
     return (
         <div className='container'>
             <h2 className='text-center'>Sign up</h2>
@@ -19,17 +36,22 @@ const Signup = () => {
                     scrollToFirstError
                 >
                     <Form.Item
-                        name="email"
-                        label="E-mail"
+                        name="username"
+                        label="Username"
                         rules={[
-                            {
-                                type: 'email',
-                                message: 'The input is not valid E-mail!',
-                            },
+
                             {
                                 required: true,
-                                message: 'Please input your E-mail!',
+                                message: 'Please input your username!',
                             },
+                            {
+                                min: 3,
+                                message: 'Username must be at least 3 characters long'
+                            },
+                            {
+                                max: 20,
+                                message: 'Username must be less than 60 characters long'
+                            }
                         ]}
                     >
                         <Input size='large' />
