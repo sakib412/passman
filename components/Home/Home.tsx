@@ -6,6 +6,7 @@ import { CopyOutlined, DeleteOutlined, EditOutlined, FolderFilled, FolderOutline
 import ItemCreateForm from './AddModal';
 import axiosInstance from '@/utils/axios';
 import { copyToClipboard } from '@/utils';
+import { success } from '@/utils/notificaion';
 
 const { Sider } = Layout;
 
@@ -260,6 +261,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     onFinish={(values) => {
                         axiosInstance.post('/folder/', { name: values.name }).then(res => {
                             setFolders(f => [...f, res.data.data])
+                            success('Folder added successfully')
                         })
                         Modal.destroyAll()
                     }}
@@ -285,6 +287,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const editItem = (item: ItemType) => {
         Modal.info(
             {
+                closable: true,
                 width: 800,
                 icon: null,
                 title: 'Edit item',
@@ -425,6 +428,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                                     e.stopPropagation();
 
                                     Modal.info({
+                                        closable: true,
                                         icon: null,
                                         title: 'Edit folder',
                                         content: (
@@ -432,8 +436,10 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                                                 onFinish={(values) => {
                                                     axiosInstance.put(`/folder/${_id}`, { name: values.name }).then(res => {
                                                         setFolders(f => f.map(folder => folder._id == _id ? res.data.data : folder))
+                                                        success('Folder updated successfully')
+
+                                                        Modal.destroyAll()
                                                     })
-                                                    Modal.destroyAll()
                                                 }}
                                                 name="edit_folder"
                                                 initialValues={{ name }}
@@ -451,6 +457,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                                                         axiosInstance.delete(`/folder/${_id}`).then(_res => {
                                                             setFolders(f => f.filter(folder => folder._id != _id))
                                                             Modal.destroyAll()
+                                                            success('Folder deleted successfully')
                                                         })
                                                     }}>Delete</Button>
                                                     <Form.Item>
@@ -461,9 +468,6 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                                             </Form>
                                         ),
                                         okButtonProps: { style: { display: 'none' } },
-
-
-
                                     })
                                 }}><EditOutlined /></span>
                         </div>,
