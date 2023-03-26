@@ -1,31 +1,49 @@
 "use client"
 import React from 'react';
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link';
 import { LockFilled } from '@ant-design/icons';
 import { Layout, Menu, theme, type MenuProps } from 'antd';
+import { User } from '@/types/user';
+import axiosInstance from '@/utils/axios';
 
 const { Header, Content } = Layout;
 
-const mainMenu: MenuProps['items'] = [
-    { key: '/', label: "Home" },
-    { key: '/generate-password', label: 'Generate Password' },
-    { key: '/export-import', label: 'Export Import' },
-    // { key: '/login', label: 'Login' },
-    // { key: '/signup', label: 'Signup' }
-].map(({ key, label }) => ({
-    key,
-    label: <Link href={key}>{label}</Link>
-}));
+type Props = {
+    children: React.ReactNode;
+    user: User | null;
+};
 
 
-
-
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default function MainLayout({ children, user }: Props) {
+    const router = useRouter()
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+    const onLogout = async () => {
+        await axiosInstance.get('/auth/logout')
+        router.push('/login')
+        router.refresh()
+    }
     const pathname = usePathname();
+    let menuItems: { key: string; label: string; onClick?: () => void }[] = []
+    if (user) {
+        menuItems = [...menuItems,
+        { key: '/', label: "Home" },
+        { key: '/generate-password', label: 'Generate Password' },
+        { key: '/export-import', label: 'Export Import' },
+        { key: '/logout', label: 'Logout', onClick: onLogout, }
+        ]
+    } else {
+        menuItems = [...menuItems,
+        { key: '/login', label: 'Login' },
+        { key: '/signup', label: 'Signup' }
+        ]
+    }
+    const mainMenu: MenuProps['items'] = menuItems.map(({ key, label, onClick }) => ({
+        key,
+        label: !onClick ? <Link href={key}>{label}</Link> : <span onClick={onClick}>{label}</span>
+    }));
 
     return (
         <Layout >

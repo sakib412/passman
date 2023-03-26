@@ -1,15 +1,25 @@
 "use client"
-import { Button, Checkbox, Form, Input } from 'antd';
-
-const onFinish = (values: any) => {
-};
-
-const onFinishFailed = (errorInfo: any) => {
-};
-
 import React from 'react'
+import { Button, Form, Input, message } from 'antd';
+import axiosInstance from '@/utils/axios';
+import { useRouter } from 'next/navigation';
+import { success } from '@/utils/notificaion';
+
+
+
 
 const Login = () => {
+    const router = useRouter()
+
+    const onFinish = async (values: any) => {
+        const res = await axiosInstance.post('/auth/login', values)
+        if (res.data.is_success) {
+            router.refresh()
+            router.push('/')
+            success('Login success')
+        }
+    };
+
     return (
         <div className='container'>
             <h2 className='text-center'>Login</h2>
@@ -20,14 +30,15 @@ const Login = () => {
                     labelCol={{ span: 8 }}
                     style={{ maxWidth: 600, minWidth: '30rem' }}
                     onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
-                        label="Email"
-                        name="email"
+                        label="Username"
+                        name="username"
                         rules={[
                             { required: true, message: 'Please input your email!' },
-                            { type: 'email', message: 'Please input a valid email' }]}
+                            { min: 3, message: 'Email must be at least 3 characters' },
+                            { max: 60, message: 'Email must be less than 60 characters' },
+                        ]}
                     >
                         <Input size='large' />
                     </Form.Item>

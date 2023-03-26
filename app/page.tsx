@@ -1,41 +1,54 @@
 import Home, { ItemType, type Folder } from "@/components/Home/Home";
 import axiosInstance from "@/utils/axios";
+import { redirect } from "next/navigation";
+
+import type { ApiResponsePaginated } from '@/types/response'
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic"
 
-const getAllFolders = async () => {
-  const response = await axiosInstance.get("/folder/");
-  return response.data;
+
+const getAllFolders = async (): Promise<ApiResponsePaginated<Folder> | void> => {
+  const cookieStore = cookies()
+  try {
+    const response = await axiosInstance.get("/folder/", {
+      headers: {
+        cookie: cookieStore.getAll().map(({ name, value }) => `${name}=${value}`).join('; ')
+      }
+    });
+    return response.data;
+  } catch (e: any) {
+    if (e.response.status === 401) {
+      return
+    }
+  }
 }
 
-const getAllItems = async () => {
-  const response = await axiosInstance.get("/item/");
-  return response.data;
+const getAllItems = async (): Promise<ApiResponsePaginated<ItemType> | void> => {
+  const cookieStore = cookies()
+  try {
+    const response = await axiosInstance.get("/item/", {
+      headers: {
+        cookie: cookieStore.getAll().map(({ name, value }) => `${name}=${value}`).join('; ')
+      }
+    });
+    return response.data;
+  } catch (e: any) {
+    if (e.response.status === 401) {
+      return
+    }
+  }
 }
 
 export default async function HomePage() {
-  const folders: {
-    is_success: boolean; data: {
-      currentPage: number,
-      totalData: number,
-      totalPage: number,
-      prevPage: number | null,
-      nextPage: number | null,
-      data: Folder[]
-    }
-  } = await getAllFolders();
+  const [folders, items] = await Promise.all([
+    getAllFolders(),
+    getAllItems()
+  ])
 
-  const items: {
-    is_success: boolean; data: {
-      currentPage: number,
-      totalData: number,
-      totalPage: number,
-      prevPage: number | null,
-      nextPage: number | null,
-      data: ItemType[]
-    }
-  } = await getAllItems();
-
+  if (!folders || !items) {
+    redirect("/login")
+  }
 
   return (
     <Home folders={folders.data} items={items.data} />
