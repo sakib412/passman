@@ -15,9 +15,11 @@ const Signup = () => {
 
             const res = await axiosInstance.post('/auth/signup', values)
             if (res.data.is_success) {
-                router.refresh()
-                router.push('/')
                 success('Signup success')
+                router.refresh()
+                window.location.href = '/';
+
+                router.push('/')
             }
         } catch (e: any) {
             error(e.response.data.data.message || 'Signup failed')

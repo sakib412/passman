@@ -16,9 +16,10 @@ const Login = () => {
 
             const res = await axiosInstance.post('/auth/login', values)
             if (res.data.is_success) {
+                success('Login success')
+                window.location.href = '/';
                 router.refresh()
                 router.push('/')
-                success('Login success')
             }
         } catch (e: any) {
             error(e.response.data.data.message || 'Login failed')
