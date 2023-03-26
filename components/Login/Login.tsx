@@ -3,7 +3,7 @@ import React from 'react'
 import { Button, Form, Input, message } from 'antd';
 import axiosInstance from '@/utils/axios';
 import { useRouter } from 'next/navigation';
-import { success } from '@/utils/notificaion';
+import { error, success } from '@/utils/notificaion';
 
 
 
@@ -12,11 +12,17 @@ const Login = () => {
     const router = useRouter()
 
     const onFinish = async (values: any) => {
-        const res = await axiosInstance.post('/auth/login', values)
-        if (res.data.is_success) {
-            router.refresh()
-            router.push('/')
-            success('Login success')
+        try {
+
+            const res = await axiosInstance.post('/auth/login', values)
+            if (res.data.is_success) {
+                router.refresh()
+                router.push('/')
+                success('Login success')
+            }
+        } catch (e: any) {
+            console.log(e)
+            error(e.response.data.data.message || 'Login failed')
         }
     };
 

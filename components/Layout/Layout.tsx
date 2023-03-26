@@ -6,6 +6,7 @@ import { LockFilled } from '@ant-design/icons';
 import { Layout, Menu, theme, type MenuProps } from 'antd';
 import { User } from '@/types/user';
 import axiosInstance from '@/utils/axios';
+import { success } from '@/utils/notificaion';
 
 const { Header, Content } = Layout;
 
@@ -24,6 +25,7 @@ export default function MainLayout({ children, user }: Props) {
         await axiosInstance.get('/auth/logout')
         router.push('/login')
         router.refresh()
+        success('Logout success')
     }
     const pathname = usePathname();
     let menuItems: { key: string; label: string; onClick?: () => void }[] = []
@@ -42,7 +44,8 @@ export default function MainLayout({ children, user }: Props) {
     }
     const mainMenu: MenuProps['items'] = menuItems.map(({ key, label, onClick }) => ({
         key,
-        label: !onClick ? <Link href={key}>{label}</Link> : <span onClick={onClick}>{label}</span>
+        label: <Link href={key}>{label}</Link>,
+        onClick,
     }));
 
     return (
