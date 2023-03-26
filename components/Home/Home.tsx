@@ -362,7 +362,10 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                                                 className='mb-0 w-75'
                                                 {...restField}
                                                 name={[name]}
-                                                rules={[{ required: true, message: 'Please input URL' }]}
+                                                rules={[{ required: true, message: 'Please input URL' }, {
+                                                    type: 'url',
+                                                    message: 'Please input a valid URL'
+                                                }]}
                                             >
                                                 <Input placeholder="Example: https://google.com" />
                                             </Form.Item>
@@ -497,7 +500,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             title: 'Owner',
             dataIndex: 'owner',
             key: 'owner',
-            render: (owner: number) => <Tag color={owner == 1 ? "green" : "red"}>{owner == 1 ? "Me" : "Other"}</Tag>
+            render: (owner: number) => <Tag color={owner == 1 ? "green" : "green"}>{"Me"}</Tag>
         },
         {
             title: <Dropdown

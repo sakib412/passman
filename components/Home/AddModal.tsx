@@ -120,7 +120,11 @@ const ItemCreateForm: React.FC<ItemCreateFormProps> = ({
                                         className='mb-0 w-75'
                                         {...restField}
                                         name={[name]}
-                                        rules={[{ required: true, message: 'Please input URL' }]}
+                                        rules={[{ required: true, message: 'Please input URL' },
+                                        {
+                                            type: 'url',
+                                            message: 'Please input a valid URL'
+                                        }]}
                                     >
                                         <Input placeholder="Example: https://google.com" />
                                     </Form.Item>
