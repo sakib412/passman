@@ -7,7 +7,6 @@ import React, { useEffect, useState } from 'react'
 const GeneratePassword = () => {
     const [password, setPassword] = useState<string>('');
     const [passwordLength, setPasswordLength] = useState<number>(16);
-    const [passwordType, setPasswordType] = useState<string>('password');
 
     const [passwordUppercase, setPasswordUppercase] = useState<boolean>(true);
     const [passwordLowercase, setPasswordLowercase] = useState<boolean>(true);
@@ -91,9 +90,8 @@ const GeneratePassword = () => {
                 </div>
             </div>
 
-            <div className="d-flex">
-
-                <Button size='large' type='primary' onClick={() => {
+            <div className="d-flex flex-wrap">
+                <Button size='large' className='me-2 mb-1' type='primary' onClick={() => {
                     setPassword(() =>
                         generatePassword(
                             passwordLength,
@@ -106,7 +104,7 @@ const GeneratePassword = () => {
                             avoidAmbiguous
                         ))
                 }}>Regenerate password</Button>
-                <Button className='ms-2' size='large' onClick={() => {
+                <Button size='large' onClick={() => {
                     copyToClipboard(password)
                 }}>Copy password</Button>
             </div>
