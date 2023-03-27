@@ -34,7 +34,7 @@ const Signup = () => {
                     layout='vertical'
                     name="signup"
                     onFinish={onFinish}
-                    style={{ maxWidth: 600, minWidth: '30rem' }}
+                    style={{ maxWidth: 600 }}
                     scrollToFirstError
                 >
                     <Form.Item

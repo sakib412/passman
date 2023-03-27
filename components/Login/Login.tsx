@@ -34,7 +34,7 @@ const Login = () => {
                     layout='vertical'
                     name="login"
                     labelCol={{ span: 8 }}
-                    style={{ maxWidth: 600, minWidth: '30rem' }}
+                    style={{ maxWidth: 600 }}
                     onFinish={onFinish}
                 >
                     <Form.Item

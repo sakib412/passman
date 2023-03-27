@@ -497,6 +497,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
             render: (_, item) =>
                 <div
                     onClick={() => editItem(item)}
+                    className="item-name"
                     style={{ cursor: 'pointer' }}>
                     <span
                         title='Click to edit item'
@@ -507,6 +508,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
         {
             title: 'Owner',
             dataIndex: 'owner',
+            responsive: ['sm'],
             key: 'owner',
             render: (owner: number) => <Tag color={owner == 1 ? "green" : "green"}>{"Me"}</Tag>
         },
@@ -582,6 +584,7 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                 <Table
                     loading={loading}
                     size='large'
+                    style={{ maxWidth: '100%' }}
                     rowSelection={rowSelection}
                     columns={columns}
                     dataSource={items.map(item => ({ ...item, key: item._id }))} />

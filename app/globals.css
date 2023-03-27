@@ -22,3 +22,14 @@ a {
 .ant-checkbox-wrapper {
   margin-inline-start: 0;
 }
+
+.item-name {
+  max-width: 10rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .item-name {
+    max-width: none;
+  }
+}
