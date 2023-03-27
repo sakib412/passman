@@ -42,7 +42,7 @@ const GeneratePassword = () => {
         <div style={{ fontSize: '1.3rem' }}>
             <h3>Generator</h3>
             <hr />
-            <p className='border p-4 text-center'>{password}</p>
+            <p className='border p-4 text-center text-wrap text-break'>{password}</p>
 
             <div className="row my-4">
                 <div className="col-md-4">
