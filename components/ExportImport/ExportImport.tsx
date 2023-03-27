@@ -9,6 +9,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { getExportFileName } from '@/utils';
 import axiosInstance from '@/utils/axios';
 import { useRouter } from 'next/navigation';
+import { error } from '@/utils/notificaion';
 
 
 type Props = {
@@ -25,6 +26,7 @@ const ExportImport = ({ items }: Props) => {
     })
     ))
     const download = () => {
+        if (!items.length) return error('No data to export. please add some items first')
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -54,12 +56,16 @@ const ExportImport = ({ items }: Props) => {
     };
 
     const onFinish = async () => {
+        if (!jsonData.length) {
+            error('No data to import')
+            return;
+        }
         await axiosInstance.post('/item/insert-many/', { items: jsonData.map(item => ({ ...item, folder: item.folder || null })) })
         message.success('Imported successfully')
 
         setTimeout(() => {
             router.push('/')
-        }, 3000)
+        }, 2000)
 
 
 
@@ -88,7 +94,12 @@ const ExportImport = ({ items }: Props) => {
                 <p>Import your data from a csv file</p>
 
                 <Form onFinish={onFinish}>
-                    <Form.Item>
+                    <Form.Item
+                        name='file'
+                        rules={[{
+                            required: true,
+                            message: 'Please select a CSV file'
+                        }]}>
                         <Upload {...uploadProps}>
                             <Button icon={<UploadOutlined />}>Select CSV</Button>
                         </Upload>

@@ -27,7 +27,7 @@ const getAllFolders = async (): Promise<ApiResponsePaginated<Folder> | void> => 
 const getAllItems = async (): Promise<ApiResponsePaginated<ItemType> | void> => {
   const cookieStore = cookies()
   try {
-    const response = await axiosInstance.get("/item/", {
+    const response = await axiosInstance.get("/item?size=1000", {
       headers: {
         cookie: cookieStore.getAll().map(({ name, value }) => `${name}=${value}`).join('; ')
       }

@@ -82,15 +82,16 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [refreshItem, setRefreshItem] = useState(false);
 
     useEffect(() => {
         setLoading(true)
 
-        axiosInstance.get(`/item?folder=${selectedFolder}`).then(({ data }) => {
+        axiosInstance.get(`/item?size=1000&folder=${selectedFolder}`).then(({ data }) => {
             setItems(data.data.data)
         }).finally(() => setLoading(false))
 
-    }, [selectedFolder])
+    }, [selectedFolder, refreshItem])
 
     const hasSelected = selectedRowKeys.length > 0;
 
@@ -119,10 +120,12 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                     title: 'Move selected items to another folder',
                     content: (
                         <Form
-                            onFinish={(values) => {
+                            onFinish={async (values) => {
                                 axiosInstance.put('/item/update-many/', { ids: selectedRowKeys, folder: values.folder || null }).then(({ data }) => {
                                     const { is_success } = data
                                     if (is_success) {
+                                        setSelectedRowKeys([])
+                                        setRefreshItem(refreshItem => !refreshItem)
                                         message.success('Items moved successfully')
                                     }
                                 })
@@ -189,17 +192,19 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                         <Form
                             onFinish={(values) => {
                                 axiosInstance.put(`/item/${item._id}/`, { folder: values.folder || null }).then(({ data }) => {
-                                    const { is_success, data: item } = data
+                                    const { is_success } = data
                                     if (is_success) {
-                                        const updateItemIndex = items.findIndex(i => i._id === item._id)
-                                        const newItems = [...items]
-                                        newItems[updateItemIndex] = item
-                                        setItems(newItems)
+                                        // const updateItemIndex = items.findIndex(i => i._id === item._id)
+                                        // const newItems = [...items]
+                                        // newItems[updateItemIndex] = item
+                                        // setItems(newItems)
+                                        setRefreshItem((prev) => !prev)
                                         message.success('Item moved successfully')
                                     }
                                 })
                                 Modal.destroyAll()
                             }}
+                            initialValues={{ folder: item.folder }}
                             name="move_item"
                         >
                             <Form.Item
@@ -297,12 +302,15 @@ const Home = ({ folders: foldersData, items: itemsData }: HomeProps) => {
                         size='large'
                         onFinish={(values) => {
                             axiosInstance.put(`/item/${item._id}/`, { ...values, folder: values.folder || null }).then(({ data }) => {
-                                const { is_success, data: item } = data
+                                const { is_success,
+                                    //  data: item
+                                } = data
                                 if (is_success) {
-                                    const updateItemIndex = items.findIndex(i => i._id === item._id)
-                                    const newItems = [...items]
-                                    newItems[updateItemIndex] = item
-                                    setItems(newItems)
+                                    // const updateItemIndex = items.findIndex(i => i._id === item._id)
+                                    // const newItems = [...items]
+                                    // newItems[updateItemIndex] = item
+                                    // setItems(newItems)
+                                    setRefreshItem((prev) => !prev)
                                     Modal.destroyAll()
                                     message.success('Item updated successfully')
                                 }
