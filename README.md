@@ -3,7 +3,7 @@
 ## Pre-requisites
 
 - Node.js (tested on v18.15.0)
-- Run server locally before running client [https://github.com/sakib412/passman-api](https://github.com/sakib412/passman-api)
+- Run server locally before running client ([https://github.com/sakib412/passman-api](https://github.com/sakib412/passman-api))
 
 
 
